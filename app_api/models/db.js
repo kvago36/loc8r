@@ -1,5 +1,23 @@
 var mongoose = require('mongoose');
 var readLine = require ("readline");
+var dbURI = 'mongodb://localhost/loc8rdb';
+if (process.env.NODE_ENV === 'production') {
+ dbURI = process.env.MONGOLAB_URI;
+}
+
+
+mongoose.connect(dbURI);
+
+mongoose.connection.on('connected', function () {
+ console.log('Mongoose connected to ' + dbURI);
+});
+mongoose.connection.on('error',function (err) {
+ console.log('Mongoose connection error: ' + err);
+});
+mongoose.connection.on('disconnected', function () {
+ console.log('Mongoose disconnected');
+});
+
 
 if (process.platform === "win32"){
   var rl = readLine.createInterface ({
@@ -32,22 +50,6 @@ process.on('SIGTERM', function() {
   gracefulShutdown('Heroku app shutdown', function () {
     process.exit(0);
   });
-});
-
-var dbURI = 'mongodb://localhost/loc8rdb';
-if (process.env.NODE_ENV === 'production') {
- dbURI = process.env.MONGOLAB_URI;
-}
-mongoose.connect(dbURI);
-
-mongoose.connection.on('connected', function () {
- console.log('Mongoose connected to ' + dbURI);
-});
-mongoose.connection.on('error',function (err) {
- console.log('Mongoose connection error: ' + err);
-});
-mongoose.connection.on('disconnected', function () {
- console.log('Mongoose disconnected');
 });
 
 require('./locations');
