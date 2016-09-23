@@ -61,7 +61,7 @@ module.exports.reviewsCreate = function (req, res) {
     Loc
       .findById(locationid)
       .select('reviews')
-      .exet(
+      .exec(
         function (err, location) {
           if (err) {
             res.json(404, err);
@@ -92,7 +92,7 @@ var doAddReview = function (req, res, location) {
     location.save(function(err, location){
       var thisReview;
       if (err) {
-        res.json(404, err);
+        res.json(400, err);
       } else {
         updateAverageRating(location._id);
         thisReview = location.reviews[location.reviews.length - 1];

@@ -2,6 +2,19 @@ var mongoose = require('mongoose');
 var Loc = mongoose.model('Location');
 mongoose.Promise = require('bluebird');
 
+/* meterConversion*/
+var meterConversion = (function() {
+    var mToKm = function(distance) {
+        return parseFloat(distance / 1000);
+    };
+    var kmToM = function(distance) {
+        return parseFloat(distance * 1000);
+    };
+    return {
+        mToKm : mToKm,
+        kmToM : kmToM
+    };
+})()
 /* theEarth */
 var theEarth = (function() {
   var earthRadius = 6371;
@@ -40,57 +53,6 @@ module.exports.locationsReadOne = function(req, res) {
   } else {
     res.json(404, { "message": "No location id in request"});
  }
-};
-
-/* locationsListByDistance */
-module.exports.locationsListByDistance = function(req, res) {
-  var lng = parseFloat(req.query.lng);
-  var lat = parseFloat(req.query.lat);
-  var maxDistance = parseFloat(req.query.maxDistance);
-  var point = {
-    type: "Point",
-    coordinates: [lng, lat]
-  };
-  var geoOptions = {
-    spherical: true,
-    maxDistance: theEarth.getRadsFromDistance(maxDistance),
-    num: 10
-  };
-  if (!lng || !lat || !maxDistance) {
-    console.log('locationsListByDistance missing params');
-    res.json(404, {
-      "message": "lng, lat and maxDistance query parameters are all required"
-    });
-    return;
-  }
-  Loc.geoNear(point, geoOptions, function(err, results, stats) {
-    var locations = [];
-    console.log('Geo Results', results);
-    console.log('Geo stats', stats);
-    if (err) {
-      console.log('geoNear error:', err);
-      res.json(404, err);
-    } else {
-      locations = buildLocationList(req, res, results, stats);
-      res.json(200, locations);
-    }
-  });
-};
-
-/*buildLocationList*/
-var buildLocationList = function (req, res, results, stats) {
-  var locations = [];
-  results.forEach(function(doc){
-    locations.push({
-      distance: theEarth.getDistanceFromRads(doc.dis),
-      name: doc.obj.name,
-      address: doc.obj.address,
-      rating: doc.obj.rating,
-      facilities: doc.obj.facilities,
-      _id: doc.obj._id
-    });
-  });
-  return locations;
 };
 
 /* locationsCreate */
@@ -167,7 +129,57 @@ module.exports.locationsUpdateOne = function (req, res) {
       }
     );
 };
+/* GET list of locations */
+module.exports.locationsListByDistance = function(req, res) {
+  var lng = parseFloat(req.query.lng);
+  var lat = parseFloat(req.query.lat);
+  var maxDistance = parseFloat(req.query.maxDistance);
+  var point = {
+    type: "Point",
+    coordinates: [lng, lat]
+  };
+  var geoOptions = {
+    spherical: true,
+    maxDistance: meterConversion.kmToM(maxDistance),
+    //maxDistance: theEarth.getRadsFromDistance(maxDistance),
+    num: 10
+  };
+  if ((!lng && lng!==0) || (!lat && lat!==0) || ! maxDistance) {
+    console.log('locationsListByDistance missing params');
+    res.json(404, {
+      "message": "lng, lat and maxDistance query parameters are all required"
+    });
+    return;
+  }
+  Loc.geoNear(point, geoOptions, function(err, results, stats) {
+    var locations;
+    console.log('Geo Results', results);
+    console.log('Geo stats', stats);
+    if (err) {
+      console.log('geoNear error:', err);
+      res.json(404, err);
+    } else {
+      locations = buildLocationList(req, res, results, stats);
+      res.json(200, locations);
+    }
+  });
+};
 
+var buildLocationList = function(req, res, results, stats) {
+  var locations = [];
+  results.forEach(function(doc) {
+    locations.push({
+      distance: meterConversion.mToKm(doc.dis),
+      //distance: theEarth.getDistanceFromRads(doc.dis),
+      name: doc.obj.name,
+      address: doc.obj.address,
+      rating: doc.obj.rating,
+      facilities: doc.obj.facilities,
+      _id: doc.obj._id
+    });
+  });
+  return locations;
+};
 /* locationsDeleteOne */
 module.exports.locationsDeleteOne = function (req,res) {
   var locationid = req.params.locationid;

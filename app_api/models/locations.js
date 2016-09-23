@@ -8,10 +8,10 @@ var openingTimeSchema = new mongoose.Schema({
 })
 
 var reviewSchema = new mongoose.Schema({
-  author: String,
+  author: {type: String, required: true},
   rating: {type: Number , "default":0, require: true , max: 5 , min: 0},
   createdOn: {type: Date , "default": Date.now },
-  reviewText: String
+  reviewText: {type: String, required: true}
 });
 
 var locationSchema = new mongoose.Schema({
@@ -19,7 +19,11 @@ var locationSchema = new mongoose.Schema({
   address: String,
   rating:  {type: Number, "default": 0, min: 0, max: 5},
   facilities: [String],
-  coords: {type: [Number], index: '2dspere', require: true},
+  coords: {
+        type: [Number],
+        index: '2dsphere',
+        required: true
+  },
   openningTimes: [openingTimeSchema],
   reviews: [reviewSchema]
 });

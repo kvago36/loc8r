@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var readLine = require ("readline");
 var dbURI = 'mongodb://localhost/loc8rdb';
 if (process.env.NODE_ENV === 'production') {
- dbURI = process.env.MONGOLAB_URI;
+  dbURI = process.env.MONGOLAB_URI;
 }
 
 
