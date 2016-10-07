@@ -7,3 +7,4 @@
 .page-header {margin-top: 0px;}
 .list-group-item:not(:first-child) {margin-top: 25px;}
 .panel-body.review-container .well.well-sm.review-header span.reviewAuthor {margin: 0px 5px;}
+#filter {margin-left: 4px;}

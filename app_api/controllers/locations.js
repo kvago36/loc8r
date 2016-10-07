@@ -144,6 +144,7 @@ module.exports.locationsListByDistance = function(req, res) {
     //maxDistance: theEarth.getRadsFromDistance(maxDistance),
     num: 10
   };
+
   if ((!lng && lng!==0) || (!lat && lat!==0) || ! maxDistance) {
     console.log('locationsListByDistance missing params');
     res.json(404, {
@@ -168,6 +169,7 @@ module.exports.locationsListByDistance = function(req, res) {
 var buildLocationList = function(req, res, results, stats) {
   var locations = [];
   results.forEach(function(doc) {
+    console.log(doc.dis);
     locations.push({
       distance: meterConversion.mToKm(doc.dis),
       //distance: theEarth.getDistanceFromRads(doc.dis),

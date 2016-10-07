@@ -29,46 +29,61 @@ var renderHomepage = function(req, res, responseBody) {
 };
 
 
-module.exports.homelist = function(req, res) {
-  var requestOptions, path;
-  path = '/api/locations';
-  requestOptions = {
-    url : apiOptions.server + path,
-    method : "GET",
-    json : {},
-    qs : {
-      lng : 56.299213,
-      lat : 38.126584,
-      maxDistance : 1000
-    }
-  };
-  request(
-    requestOptions,
-    function(err, response, body) {
-      var i, data;
-      data = body;
-      if (response.statusCode === 200 && data.length) {
-        for (i = 0; i < data.length; i ++) {
-          data[i].distance = _formatDistance(data[i].distance);
-        }
-      }
-      renderHomepage(req, res, data);
-    }
-  );
+// module.exports.homelist = function(req, res) {
+//   var requestOptions, path;
+//   path = '/api/locations';
+//   requestOptions = {
+//     url : apiOptions.server + path,
+//     method : "GET",
+//     json : {},
+//     qs : {
+//       lng : 56.299213,
+//       lat : 38.126584,
+//       maxDistance : 1000
+//     }
+//   };
+//   request(
+//     requestOptions,
+//     function(err, response, body) {
+//       var i, data;
+//       data = body;
+//       if (response.statusCode === 200 && data.length) {
+//         for (i = 0; i < data.length; i ++) {
+//           data[i].distance = _formatDistance(data[i].distance);
+//         }
+//       }
+//       renderHomepage(req, res, data);
+//     }
+//   );
+// };
+
+module.exports.homelist = function(req, res){
+ renderHomepage(req, res);
 };
 
+// var renderHomepage = function(req, res){
+//   res.render('locations-list', {
+//     title: 'Loc8r - find a place to work with wifi',
+//     pageHeader: {
+//       title: 'Loc8r',
+//       strapline: 'Find places to work with wifi near you!'
+//     },
+//     sidebar: "Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you're looking for."
+//   });
+// };
+
 /* _formatDistance */
-var _formatDistance = function (distance) {
-  var numDistance, unit;
-  if (distance > 1) {
-    numDistance = parseFloat(distance).toFixed(1);
-    unit = ' km';
-  } else {
-    numDistance = parseInt(distance * 1000,10);
-    unit = ' m';
-  }
-  return numDistance + unit;
-};
+// var _formatDistance = function (distance) {
+//   var numDistance, unit;
+//   if (distance > 1) {
+//     numDistance = parseFloat(distance).toFixed(1);
+//     unit = ' km';
+//   } else {
+//     numDistance = parseInt(distance * 1000,10);
+//     unit = ' m';
+//   }
+//   return numDistance + unit;
+// };
 
 /* renderDetailPage */
 var renderDetailPage = function(req, res, locDetail) {
